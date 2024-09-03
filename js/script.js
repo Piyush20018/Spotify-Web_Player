@@ -68,7 +68,7 @@ const playMusic = (track, pause = false) => {
         play.src = "img/pause.svg"
     }
 
-    document.querySelector(".songinfo").innerHTML = track
+    document.querySelector(".songinfo").innerHTML = decodeURI(track)
     document.querySelector(".songtime").innerHTML = "00:00 / 00:00"
 
 
@@ -77,7 +77,7 @@ const playMusic = (track, pause = false) => {
 
 
 async function displayAlbums() {
-    let a = await fetch(`http://127.0.0.1:5500/Javascript/Spotify/songs/`)
+    let a = await fetch(`http://127.0.0.1:5500/songs/`)
     let response = await a.text();
     // console.log(response)
     let div = document.createElement("div")
@@ -88,9 +88,9 @@ async function displayAlbums() {
     for (let index = 0; index < array.length; index++) {
         const e = array[index];
 
-        if (e.href.includes("/Javascript/Spotify/songs/")) {
+        if (e.href.includes("/songs/")) {
             let folder = e.href.split("/").slice(-1)[0]
-            let a = await fetch(`http://127.0.0.1:5500/Javascript/Spotify/songs/${folder}/info.json`)
+            let a = await fetch(`http://127.0.0.1:5500/songs/${folder}/info.json`)
             let response = await a.json();
             console.log(response)
             cardcontainer.innerHTML = cardcontainer.innerHTML + `<div data-folder="${folder}" class="card">
@@ -103,7 +103,7 @@ async function displayAlbums() {
                 </svg>
             </div>
 
-            <img src="/Javascript/Spotify/songs/${folder}/cover.png" alt="">
+            <img src="/songs/${folder}/cover.png" alt="">
             <h2>${response.title}</h2>
             <p>${response.description}</p>
 
@@ -112,22 +112,22 @@ async function displayAlbums() {
     }
 
     //Load the playlist whenever card is clicked
-    Array.from(document.getElementsByClassName("card")).forEach(e => {
-        // console.log(e)
+    Array.from(document.getElementsByClassName("card")).forEach(e => { 
         e.addEventListener("click", async item => {
-            // console.log("Fetching songs")
-            songs = await getSongs(`Javascript/Spotify/songs/${item.currentTarget.dataset.folder}`)
+            console.log("Fetching Songs")
+            songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`)  
             playMusic(songs[0])
+
         })
     })
 }
 async function main() {
 
-    await getSongs("Javascript/Spotify/songs/ncs")
+    await getSongs("songs/ncs")
     playMusic(songs[0], true)
 
     //display all the albums on the page
-    displayAlbums()
+    await displayAlbums()
 
 
 
